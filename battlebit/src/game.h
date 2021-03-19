@@ -31,6 +31,8 @@ void game_init_player_info(player_info *player_info);
 
 int game_fire(game *game, int player, int x, int y);
 
+int shipLength(char x);
+
 int game_load_board(game *game, int player, char * spec);
 
 int add_ship_horizontal(player_info *player, int x, int y, int length);
