@@ -1,0 +1,6 @@
+3,5c3
+< Error in /home/carson/Projects/msu/csci-366-spring2021/grading/scripts/repos/justin_hickman/homework_3/tmp.mips line 14 column 1: "12345678910" is not a recognized operator
+< 
+< Processing terminated due to errors.
+---
+> 12345678910
