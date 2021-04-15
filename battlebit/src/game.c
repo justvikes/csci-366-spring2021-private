@@ -38,6 +38,41 @@ int game_fire(game *game, int player, int x, int y) {
     //
     // If the opponents ships value is 0, they have no remaining ships, and you should set the game state to
     // PLAYER_1_WINS or PLAYER_2_WINS depending on who won.
+    player_info *shooter_info = &game->players[player];
+
+    //player getting hit
+    player_info *shootee_info = &game->players[1-player];
+
+    //mask of shot from shooter
+    unsigned long long int bitmask = xy_to_bitval(x, y);
+
+    //update shots for shooter
+    shooter_info->shots = shooter_info->shots | bitmask;
+
+    if(game->status == PLAYER_0_TURN){
+        game->status = PLAYER_1_TURN;
+    }
+    else if(game->status == PLAYER_1_TURN){
+        game->status = PLAYER_0_TURN;
+    }
+    //updating if there are hits
+    if((shootee_info->ships & bitmask) != 0ULL){
+        //hurt_info->ships &= ~(1UL << mask);
+        //shooter_info->hits |= 1UL << mask;
+        shootee_info->ships = shootee_info->ships & (~bitmask);
+        shooter_info->hits = shooter_info->hits | bitmask;
+        if(shootee_info->ships == 0ULL) {
+            if(player == 1){
+                game->status = PLAYER_1_WINS;
+            }
+            else{
+                game->status = PLAYER_0_WINS;
+            }
+        }
+        return 1;
+    }
+
+    return 0;
 }
 
 unsigned long long int xy_to_bitval(int x, int y) {
@@ -79,58 +114,64 @@ int game_load_board(struct game *game, int player, char * spec) {
     // slot and return 1
     //
     // if it is invalid, you should return -1
-
+    
     //number of characters in the string
     int specPos = 0;
     // ship index is the position of the ship type in the spec
     int shipIndex = 0;
 
+    player_info *player_info = &game->players[player];
+
     if(spec == NULL ){
         return -1;
     }
     for(int i=0; i < 5; i++){
-        if(spec[shipIndex] == '\0' | spec[shipIndex + 1] == '\0' | spec[shipIndex + 2] == '\0'){
+        if(spec[shipIndex] == '\0' | spec[shipIndex+1] == '\0' | spec[shipIndex+2] == '\0'){
             return -1;
         }
-        int shipSize;
-        shipSize = shipLength(spec[shipIndex]);
-        if(shipSize == 0){
+        int ship_size;
+        ship_size = shipLength(spec[shipIndex]);
+        if(ship_size == 0){
             return -1;
         }
         else{
             //here we will test add the ships
             //horizontal add
             if(spec[shipIndex] >= 'A' & spec[shipIndex] <= 'Z'){
-                if(add_ship_horizontal(game->players, (spec[shipIndex + 1] - '0'), (spec[shipIndex + 2] - '0'), shipSize) != 1){
+                int test;
+                test = add_ship_horizontal(player_info, (spec[shipIndex + 1] - '0'), (spec[shipIndex + 2] - '0'),
+                                           ship_size);
+                if(test == -1){
                     return -1;
                 }
+
             }
-            //vertical add
-            if(spec[shipIndex] >= 'a' & spec[shipIndex] <= 'z'){
-                if(add_ship_vertical(game->players, (spec[shipIndex + 1] - '0'), (spec[shipIndex + 2] - '0'), shipSize) != 1){
+                //vertical add
+            else if(spec[shipIndex] >= 'a' & spec[shipIndex] <= 'z'){
+                int test;
+                test = add_ship_vertical(player_info, (spec[shipIndex + 1] - '0'), (spec[shipIndex + 2] - '0'), ship_size);
+                if(test == -1){
                     return -1;
                 }
             }
         }
         shipIndex += 3;
+        specPos++;
 
     }
-    for(int i=0; spec[i] != '\0'; i++){
-        //char temp = spec[i];
-        if((spec[specPos] == 'C') | (spec[specPos] == 'c') |(spec[specPos] == 'B') |(spec[specPos] == 'b') |
-           (spec[specPos] == 'D') | (spec[specPos] == 'd') | (spec[specPos] == 'S') | (spec[specPos] == 's') |
-           (spec[specPos] == 'P') | (spec[specPos] == 'p') | (spec[specPos] == '0') | (spec[specPos] == '1') |
-           (spec[specPos] == '2') | (spec[specPos] == '3') | (spec[specPos] == '4') | (spec[specPos] == '5') |
-           (spec[specPos] == '6') | (spec[specPos] == '7') ){
-            specPos ++;
-        }
-
-    }
-    if(specPos != 15){
+    int turnCount = 0;
+    if(specPos != 5){
         return -1;
     }
     else{
-        long long int temp = game->players->ships;
+        for(int i = 0; i < 2; i++){
+            if(game->players[i].ships != 0){
+                turnCount++;
+            }
+        }
+        if(turnCount == 2){
+            game->status = PLAYER_0_TURN;
+        }
         return 1;
     }
 }
