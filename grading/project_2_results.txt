@@ -20,7 +20,7 @@ string: Foo
 [       OK ] char_buff.noOverFlow (0 ms)
 [ RUN      ] char_buff.tokenize
 [       OK ] char_buff.tokenize (0 ms)
-[----------] 3 tests from char_buff (0 ms total)
+[----------] 3 tests from char_buff (1 ms total)
 
 [----------] 2 tests from xy_to_bitval
 [ RUN      ] xy_to_bitval.good_values
@@ -83,10 +83,10 @@ string: Foo
 
 [----------] 2 tests from repl_print_ships
 [ RUN      ] repl_print_ships.print_ships
-[       OK ] repl_print_ships.print_ships (1 ms)
+[       OK ] repl_print_ships.print_ships (0 ms)
 [ RUN      ] repl_print_ships.print_ship_status
 [       OK ] repl_print_ships.print_ship_status (0 ms)
-[----------] 2 tests from repl_print_ships (1 ms total)
+[----------] 2 tests from repl_print_ships (0 ms total)
 
 [----------] 2 tests from repl_print_hits
 [ RUN      ] repl_print_hits.print_hits
